@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grant Aviation - Crew Change Reservation Sheet Auto-Filler</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f4f8;
+        color: #222;
+        margin: 0;
+        padding: 20px;
+    }
+    .config-container {
+        max-width: 900px;
+        margin: 0 auto 30px auto;
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .config-container h1 {
+        color: #004080;
+        margin-top: 0;
+        font-size: 18pt;
+    }
+    .controls-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 15px;
+    }
+    .control-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .control-group label {
+        font-size: 8.5pt;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+    .control-group input, .control-group select {
+        padding: 9px 12px;
+        font-size: 10pt;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fff;
+    }
+    .btn-print {
+        display: block;
+        width: 100%;
+        background: #004080;
+        color: white;
+        border: none;
+        padding: 12px;
+        font-size: 11pt;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 20px;
+        text-align: center;
+    }
+    .btn-print:hover {
+        background: #003366;
+    }
+
+    /* PRINT SHEET: EXACT MATCH TO GRANT AVIATION ORIGINAL FORM WITH WATERMARK */
+    .print-sheet {
+        display: none;
+    }
+
+    @media print {
+        @page {
+            size: letter portrait;
+            margin: 0.5in;
+        }
+        body {
+            background: #fff;
+            padding: 0;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #000;
+        }
+        .config-container {
+            display: none !important;
+        }
+        .print-sheet {
+            display: block !important;
+            width: 100%;
+            position: relative;
+            min-height: 10in;
+        }
+
+        /* Watermark Background */
+        .watermark-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            opacity: 0.30;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Exact Header */
+        .form-header {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        .logo-title {
+            font-size: 14pt;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+        }
+        .sub-title {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+        .contact-info {
+            font-size: 9pt;
+            text-align: right;
+            line-height: 1.35;
+        }
+
+        /* Metadata Underline Fields */
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 10pt;
+            position: relative;
+            z-index: 2;
+        }
+        .meta-table td {
+            padding: 4px 2px;
+            vertical-align: bottom;
+        }
+        .field-label {
+            font-weight: bold;
+        }
+        .field-value {
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            font-weight: normal;
+            display: inline-block;
+            width: 75%;
+        }
+        .field-value-short {
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            font-weight: normal;
+            display: inline-block;
+            width: 60%;
+        }
+
+        /* Data Grid Table */
+        .data-table-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+        .data-table th {
+            border: 1px solid #000;
+            background-color: #d0d0d0;
+            -webkit-print-color-adjust: exact;
+            font-size: 9.5pt;
+            font-weight: bold;
+            text-align: center;
+            padding: 6px;
+            letter-spacing: 0.5px;
+        }
+        .data-table td {
+            border: 1px solid #000;
+            height: 18px;
+            font-size: 9pt;
+            padding: 2px 8px;
+            vertical-align: middle;
+            background: transparent;
+        }
+        .holiday-row td {
+            background-color: #fff3cd !important;
+            -webkit-print-color-adjust: exact;
+            font-weight: bold;
+        }
+
+        /* Footer Notice */
+        .form-footer {
+            margin-top: 8px;
+            text-align: center;
+            font-size: 9pt;
+            font-weight: bold;
+            line-height: 1.3;
+            position: relative;
+            z-index: 2;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="config-container">
+    <h1>Grant Aviation Crew Change Auto-Scheduler</h1>
+    <p>Configure your details below. When you click <strong>Print / Save as PDF</strong>, it will generate an exact digital replica filled out with your 1-year schedule.</p>
+    
+    <div class="controls-grid">
+        <div class="control-group">
+            <label>Passenger Name</label>
+            <input type="text" id="passName" value="Keith Swaby" oninput="updateFields()">
+        </div>
+        <div class="control-group">
+            <label>Phone Number</label>
+            <input type="text" id="passPhone" value="(907) 394-0867" oninput="updateFields()">
+        </div>
+        <div class="control-group">
+            <label>Rewards Number</label>
+            <input type="text" id="rewardsNum" value="GV16348" placeholder="Enter rewards #" oninput="updateFields()">
+        </div>
+        <div class="control-group">
+            <label>Rotation Length</label>
+            <select id="rotLength" onchange="generateSchedule()">
+                <option value="1">1 Week On / 1 Week Off</option>
+                <option value="2">2 Weeks On / 2 Weeks Off</option>
+                <option value="3" selected>3 Weeks On / 3 Weeks Off</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Start Date</label>
+            <input type="date" id="startDate" value="2026-11-16" onchange="generateSchedule()">
+        </div>
+        <div class="control-group">
+            <label>Northbound Flight (Kenai -> Anchorage)</label>
+            <select id="nbFlight" onchange="generateSchedule()">
+                <option value="GV6000">GV6000 - Departs Kenai 4:25 AM</option>
+                <option value="GV6010">GV6010 - Departs Kenai 4:55 AM</option>
+                <option value="GV6030">GV6030 - Departs Kenai 5:55 AM</option>
+                <option value="GV6040">GV6040 - Departs Kenai 6:25 AM</option>
+                <option value="GV6050">GV6050 - Departs Kenai 6:55 AM</option>
+                <option value="GV6070">GV6070 - Departs Kenai 7:55 AM</option>
+                <option value="GV6080">GV6080 - Departs Kenai 8:25 AM</option>
+                <option value="GV6090">GV6090 - Departs Kenai 8:55 AM</option>
+                <option value="GV6100">GV6100 - Departs Kenai 9:25 AM</option>
+                <option value="GV6110">GV6110 - Departs Kenai 9:55 AM</option>
+                <option value="GV6120">GV6120 - Departs Kenai 10:25 AM</option>
+                <option value="GV6130">GV6130 - Departs Kenai 10:55 AM</option>
+                <option value="GV6140">GV6140 - Departs Kenai 11:25 AM</option>
+                <option value="GV6150">GV6150 - Departs Kenai 11:55 AM</option>
+                <option value="GV6160">GV6160 - Departs Kenai 12:25 PM</option>
+                <option value="GV6170">GV6170 - Departs Kenai 12:55 PM</option>
+                <option value="GV6180">GV6180 - Departs Kenai 1:25 PM</option>
+                <option value="GV6190">GV6190 - Departs Kenai 1:55 PM</option>
+                <option value="GV6200">GV6200 - Departs Kenai 2:25 PM</option>
+                <option value="GV6210">GV6210 - Departs Kenai 2:55 PM</option>
+                <option value="GV6220">GV6220 - Departs Kenai 3:25 PM</option>
+                <option value="GV6230">GV6230 - Departs Kenai 3:55 PM</option>
+                <option value="GV6240">GV6240 - Departs Kenai 4:25 PM</option>
+                <option value="GV6250">GV6250 - Departs Kenai 4:55 PM</option>
+                <option value="GV6260">GV6260 - Departs Kenai 5:25 PM</option>
+                <option value="GV6270">GV6270 - Departs Kenai 5:55 PM</option>
+                <option value="GV6280">GV6280 - Departs Kenai 6:25 PM</option>
+                <option value="GV6290">GV6290 - Departs Kenai 6:55 PM</option>
+                <option value="GV6310">GV6310 - Departs Kenai 7:55 PM</option>
+                <option value="GV6320">GV6320 - Departs Kenai 8:25 PM</option>
+                <option value="GV6330">GV6330 - Departs Kenai 8:55 PM</option>
+                <option value="GV6350" selected>GV6350 - Departs Kenai 9:55 PM</option>
+            </select>
+        </div>
+        <div class="control-group" style="grid-column: span 2;">
+            <label>Southbound Flight (Anchorage -> Kenai)</label>
+            <select id="sbFlight" onchange="generateSchedule()">
+                <option value="GV5515">GV5515 - Departs ANC 5:00 AM</option>
+                <option value="GV5525">GV5525 - Departs ANC 5:30 AM</option>
+                <option value="GV5535">GV5535 - Departs ANC 6:00 AM</option>
+                <option value="GV5555">GV5555 - Departs ANC 7:00 AM</option>
+                <option value="GV5565">GV5565 - Departs ANC 7:30 AM</option>
+                <option value="GV5575">GV5575 - Departs ANC 8:00 AM</option>
+                <option value="GV5585">GV5585 - Departs ANC 8:30 AM</option>
+                <option value="GV5595">GV5595 - Departs ANC 9:00 AM</option>
+                <option value="GV5605">GV5605 - Departs ANC 9:30 AM</option>
+                <option value="GV5615">GV5615 - Departs ANC 10:00 AM</option>
+                <option value="GV5625">GV5625 - Departs ANC 10:30 AM</option>
+                <option value="GV5635">GV5635 - Departs ANC 11:00 AM</option>
+                <option value="GV5645">GV5645 - Departs ANC 11:30 AM</option>
+                <option value="GV5655">GV5655 - Departs ANC 12:00 PM</option>
+                <option value="GV5665">GV5665 - Departs ANC 12:30 PM</option>
+                <option value="GV5675">GV5675 - Departs ANC 1:00 PM</option>
+                <option value="GV5685" selected>GV5685 - Departs ANC 1:30 PM</option>
+                <option value="GV5695">GV5695 - Departs ANC 2:00 PM</option>
+                <option value="GV5705">GV5705 - Departs ANC 2:30 PM</option>
+                <option value="GV5715">GV5715 - Departs ANC 3:00 PM</option>
+                <option value="GV5725">GV5725 - Departs ANC 3:30 PM</option>
+                <option value="GV5735">GV5735 - Departs ANC 4:00 PM</option>
+                <option value="GV5745">GV5745 - Departs ANC 4:30 PM</option>
+                <option value="GV5755">GV5755 - Departs ANC 5:00 PM</option>
+                <option value="GV5765">GV5765 - Departs ANC 5:30 PM</option>
+                <option value="GV5775">GV5775 - Departs ANC 6:00 PM</option>
+                <option value="GV5795">GV5795 - Departs ANC 7:00 PM</option>
+                <option value="GV5805">GV5805 - Departs ANC 7:30 PM</option>
+                <option value="GV5815">GV5815 - Departs ANC 8:00 PM</option>
+                <option value="GV5835">GV5835 - Departs ANC 9:00 PM</option>
+                <option value="GV5845">GV5845 - Departs ANC 9:30 PM</option>
+                <option value="GV5855">GV5855 - Departs ANC 10:00 PM</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn-print" onclick="window.print()">Print / Save Exact Form as PDF</button>
+</div>
+
+<!-- EXACT DIGITAL TWIN PRINT SHEET WITH WATERMARK -->
+<div class="print-sheet">
+    <!-- SVG Watermark Background mimicking Grant Aviation's airplane logo watermark -->
+    <img
+    class="watermark-bg"
+    src="Designer (1).png"
+    alt="">
+    </svg>
+
+    <table class="form-header">
+        <tr>
+            <td style="width: 55%;">
+                <div class="logo-title">GRANT AVIATION</div>
+                <div class="sub-title">CREW CHANGE RESERVATION SHEET</div>
+            </td>
+            <td style="width: 45%;">
+                <div class="contact-info">
+                    Kenai Station phone (907) 283-6012<br>
+                    Kenai Station fax (907) 283-6025<br>
+                    e-mail res@flygrant.com
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="meta-table">
+        <tr>
+            <td style="width: 55%;">
+                <span class="field-label">Name:</span> <span class="field-value" id="dispName">Keith Swaby</span>
+            </td>
+            <td style="width: 45%;">
+                <span class="field-label">Phone:</span> <span class="field-value-short" id="dispPhone">(907) 394-0867</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding-top: 6px;">
+                <span class="field-label">Rewards Number:</span> <span class="field-value" id="dispRewards" style="width: 65%;">GV16348</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">DATE</th>
+                    <th style="width: 25%;">FLIGHT</th>
+                    <th style="width: 22%;">FROM</th>
+                    <th style="width: 23%;">TO</th>
+                </tr>
+            </thead>
+            <tbody id="printGridBody">
+                <!-- Populated via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-footer">
+       
+        Closed: July 4TH, Thanksgiving, Christmas and New Year's Day
+    </div>
+</div>
+
+<script>
+function updateFields() {
+    document.getElementById('dispName').innerText = document.getElementById('passName').value || '';
+    document.getElementById('dispPhone').innerText = document.getElementById('passPhone').value || '';
+    document.getElementById('dispRewards').innerText = document.getElementById('rewardsNum').value || '';
+}
+
+function formatDate(d) {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${mm}-${dd}-${yyyy} (${days[d.getDay()]})`;
+}
+
+function getHolidayName(d) {
+    const month = d.getMonth();
+    const date = d.getDate();
+    const dayOfWeek = d.getDay();
+    
+    if (month === 0 && date === 1) return "New Year's Day (CLOSED)";
+    if (month === 6 && date === 4) return "July 4th (CLOSED)";
+    if (month === 11 && date === 25) return "Christmas Day (CLOSED)";
+    if (month === 10 && dayOfWeek === 4) {
+        let firstDayOfMonth = new Date(d.getFullYear(), 10, 1).getDay();
+        let firstThursday = (1 + (4 - firstDayOfMonth + 7) % 7);
+        let fourthThursday = firstThursday + 21;
+        if (date === fourthThursday) return "Thanksgiving Day (CLOSED)";
+    }
+    return null;
+}
+
+function generateSchedule() {
+    updateFields();
+    const rotWeeks = parseInt(document.getElementById('rotLength').value);
+    const startInput = document.getElementById('startDate').value;
+    const nbFlt = document.getElementById('nbFlight').value;
+    const sbFlt = document.getElementById('sbFlight').value;
+    
+    let baseDate = startInput ? new Date(startInput + 'T00:00:00') : new Date('2026-11-16T00:00:00');
+    
+    let gridBody = document.getElementById('printGridBody');
+    gridBody.innerHTML = '';
+    
+    let cycleWeeks = rotWeeks * 2;
+    let cycleDays = cycleWeeks * 7;
+    let totalDays = 365;
+    
+    let dayCursor = 0;
+    let rowCount = 0;
+    
+    while (dayCursor < totalDays && rowCount < 26) {
+        let cycleStart = new Date(baseDate);
+        cycleStart.setDate(baseDate.getDate() + dayCursor);
+        
+        // Northbound flight date (Kenai -> Anchorage)
+        let nbDate = new Date(cycleStart);
+        if ((nbDate - baseDate) / (1000 * 60 * 60 * 24) < totalDays && rowCount < 26) {
+            let holiday = getHolidayName(nbDate);
+            let tr1 = document.createElement('tr');
+            if (holiday) tr1.className = 'holiday-row';
+            
+            tr1.innerHTML = `
+                <td><strong>${formatDate(nbDate)}</strong>${holiday ? ' ⚠️' : ''}</td>
+                <td><strong>${nbFlt}</strong></td>
+                <td>Kenai (ENA)</td>
+                <td>Anchorage (ANC)</td>
+            `;
+            gridBody.appendChild(tr1);
+            rowCount++;
+        }
+        
+        // Southbound flight date (Anchorage -> Kenai)
+        let sbDate = new Date(cycleStart);
+        sbDate.setDate(cycleStart.getDate() + (rotWeeks * 7));
+        if ((sbDate - baseDate) / (1000 * 60 * 60 * 24) < totalDays && rowCount < 22) {
+            let holiday = getHolidayName(sbDate);
+            let tr2 = document.createElement('tr');
+            if (holiday) tr2.className = 'holiday-row';
+            
+            tr2.innerHTML = `
+                <td><strong>${formatDate(sbDate)}</strong>${holiday ? ' ⚠️' : ''}</td>
+                <td><strong>${sbFlt}</strong></td>
+                <td>Anchorage (ANC)</td>
+                <td>Kenai (ENA)</td>
+            `;
+            gridBody.appendChild(tr2);
+            rowCount++;
+        }
+        
+        dayCursor += cycleDays;
+    }
+
+    // Fill remaining empty rows to match exact height of original sheet
+    while (rowCount < 20) {
+        let trEmpty = document.createElement('tr');
+        trEmpty.innerHTML = `<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>`;
+        gridBody.appendChild(trEmpty);
+        rowCount++;
+    }
+}
+
+// Initial run
+generateSchedule();
+</script>
+</body>
+</html>
