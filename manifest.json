@@ -22,7 +22,7 @@
   "screenshots": [
     {
       "src": "screenshot-phone.png",
-      "sizes": "400x816",
+      "sizes": "800x1632",
       "type": "image/png",
       "form_factor": "narrow"
     }
