@@ -5,6 +5,7 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#004080",
+
   "icons": [
     {
       "src": "icon-192.png",
@@ -15,6 +16,15 @@
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "screenshot-phone.png",
+      "sizes": "400x816",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }
