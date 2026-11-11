@@ -74,6 +74,35 @@
     .btn-print:hover {
         background: #003366;
     }
+    /* Mobile layout */
+@media (max-width: 768px) {
+
+    .controls-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .config-container {
+        max-width: 100%;
+        width: 100%;
+        padding: 15px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .control-group {
+        Width: 100%;
+    }
+
+    .control-group input,
+    .control-group select {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .control-group[style] {
+        grid-column: span 1 !important;
+    }
+}
 
     /* PRINT SHEET: EXACT MATCH TO GRANT AVIATION ORIGINAL FORM WITH WATERMARK */
     .print-sheet {
