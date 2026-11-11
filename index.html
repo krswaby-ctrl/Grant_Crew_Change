@@ -2,7 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Grant Aviation - Crew Change Reservation Sheet Auto-Filler</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#004080">
+
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -323,12 +332,11 @@
 
 <!-- EXACT DIGITAL TWIN PRINT SHEET WITH WATERMARK -->
 <div class="print-sheet">
-    <!-- SVG Watermark Background mimicking Grant Aviation's airplane logo watermark -->
+    <!--Watermark Background mimicking Grant Aviation's airplane logo watermark -->
     <img
     class="watermark-bg"
-    src="Designer (1).png"
+    src="grant-watermark.png"
     alt="">
-    </svg>
 
     <table class="form-header">
         <tr>
@@ -396,7 +404,7 @@ function formatDate(d) {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
-    return `${mm}-${dd}-${yyyy} (${days[d.getDay()]})`;
+    return `${mm}/${dd}/${yyyy} (${days[d.getDay()]})`;
 }
 
 function getHolidayName(d) {
@@ -459,7 +467,7 @@ function generateSchedule() {
         // Southbound flight date (Anchorage -> Kenai)
         let sbDate = new Date(cycleStart);
         sbDate.setDate(cycleStart.getDate() + (rotWeeks * 7));
-        if ((sbDate - baseDate) / (1000 * 60 * 60 * 24) < totalDays && rowCount < 22) {
+        if ((sbDate - baseDate) / (1000 * 60 * 60 * 24) < totalDays && rowCount < 26) {
             let holiday = getHolidayName(sbDate);
             let tr2 = document.createElement('tr');
             if (holiday) tr2.className = 'holiday-row';
@@ -478,7 +486,7 @@ function generateSchedule() {
     }
 
     // Fill remaining empty rows to match exact height of original sheet
-    while (rowCount < 20) {
+    while (rowCount < 26) {
         let trEmpty = document.createElement('tr');
         trEmpty.innerHTML = `<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>`;
         gridBody.appendChild(trEmpty);
@@ -488,6 +496,15 @@ function generateSchedule() {
 
 // Initial run
 generateSchedule();
+</script>
+    <script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('Service Worker registered'))
+            .catch(err => console.log('Service Worker failed', err));
+    });
+}
 </script>
 </body>
 </html>
