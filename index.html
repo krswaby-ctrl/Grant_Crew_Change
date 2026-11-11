@@ -258,15 +258,15 @@
     <div class="controls-grid">
         <div class="control-group">
             <label>Passenger Name</label>
-            <input type="text" id="passName" placeholder="Enter passenger name">
+            <input type="text" id="passName" placeholder="Enter passenger name" oninput="updateFields()">
         </div>
         <div class="control-group">
             <label>Phone Number</label>
-            <input type="text" id="passPhone" placeholder="Enter phone number">
+            <input type="text" id="passPhone" placeholder="Enter phone number" oninput="updateFields()">
         </div>
         <div class="control-group">
             <label>Rewards Number</label>
-            <input type="text" id="rewardsNum" placeholder="Enter rewards number">
+            <input type="text" id="rewardsNum" placeholder="Enter rewards number" oninput="updateFields()">
         </div>
         <div class="control-group">
             <label>Rotation Length</label>
@@ -386,15 +386,15 @@
     <table class="meta-table">
         <tr>
             <td style="width: 55%;">
-                <span class="field-label">Name:</span> <span class="field-value" id="dispName">Keith Swaby</span>
+                <span class="field-label">Name:</span> <span class="field-value" id="dispName"></span>
             </td>
             <td style="width: 45%;">
-                <span class="field-label">Phone:</span> <span class="field-value-short" id="dispPhone">(907) 394-0867</span>
+                <span class="field-label">Phone:</span> <span class="field-value-short" id="dispPhone"></span>
             </td>
         </tr>
         <tr>
             <td colspan="2" style="padding-top: 6px;">
-                <span class="field-label">Rewards Number:</span> <span class="field-value" id="dispRewards" style="width: 65%;">GV16348</span>
+                <span class="field-label">Rewards Number:</span> <span class="field-value" id="dispRewards" style="width: 65%;"></span>
             </td>
         </tr>
     </table>
