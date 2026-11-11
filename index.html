@@ -483,12 +483,17 @@ function generateSchedule() {
             let tr1 = document.createElement('tr');
             if (holiday) tr1.className = 'holiday-row';
             
+            const nbText = document.getElementById('nbFlight')
+                .selectedOptions[0]
+                .text
+                .replace(' - Departs Kenai ', ' ');
+
             tr1.innerHTML = `
-                <td><strong>${formatDate(nbDate)}</strong>${holiday ? ' ⚠️' : ''}</td>
-                <td><strong>${nbFlt}</strong></td>
-                <td>Kenai (ENA)</td>
-                <td>Anchorage (ANC)</td>
-            `;
+            <td><strong>${formatDate(nbDate)}</strong>${holiday ? ' ⚠️' : ''}</td>
+            <td><strong>${nbText}</strong></td>
+            <td>Kenai (ENA)</td>
+            <td>Anchorage (ANC)</td>
+`;
             gridBody.appendChild(tr1);
             rowCount++;
         }
@@ -500,10 +505,15 @@ function generateSchedule() {
             let holiday = getHolidayName(sbDate);
             let tr2 = document.createElement('tr');
             if (holiday) tr2.className = 'holiday-row';
+
+            const sbText = document.getElementById('sbFlight')
+                .selectedOptions[0]
+                .text
+                .replace(' - Departs ANC ', ' ');
             
             tr2.innerHTML = `
                 <td><strong>${formatDate(sbDate)}</strong>${holiday ? ' ⚠️' : ''}</td>
-                <td><strong>${sbFlt}</strong></td>
+                <td><strong>${sbText}</strong></td>
                 <td>Anchorage (ANC)</td>
                 <td>Kenai (ENA)</td>
             `;
