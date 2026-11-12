@@ -253,7 +253,7 @@
 
 <div class="config-container">
     <h1>Grant Aviation Crew Change Auto-Scheduler</h1>
-    <p>Configure your details below. When you click <strong>Generate Crew Change Form</strong>, a completed reservation sheet will be created using your selected rotation and flight preferences.</p>
+    <p>Select your rotation schedule, first northbound flight date, and preferred flights. Reservations are generated beginning with the selected northbound flight and then alternate northbound and southbound for the selected rotation schedule. When you click <strong>Generate Crew Change Form</strong>, a completed reservation sheet will be created using your selected rotation and flight preferences.</p>
     
     <div class="controls-grid">
         <div class="control-group">
@@ -277,9 +277,12 @@
             </select>
         </div>
         <div class="control-group">
-            <label>Start Date</label>
+            <label>First Northbound Flight Date</label>
             <input type="date" id="startDate" value="2026-11-16" onchange="generateSchedule()">
-        </div>
+            <small style="font-size:8pt;color:#cc0000;">
+                First scheduled Kenai → Anchorage flight.
+            </small>
+      
         <div class="control-group">
             <label>Northbound Flight (Kenai -> Anchorage)</label>
             <select id="nbFlight" onchange="generateSchedule()">
